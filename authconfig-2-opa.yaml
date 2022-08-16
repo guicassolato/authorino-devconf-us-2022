@@ -1,0 +1,41 @@
+apiVersion: authorino.kuadrant.io/v1beta1
+kind: AuthConfig
+metadata:
+  name: news-api-protection
+spec:
+  hosts:
+  - news-api.127.0.0.1.nip.io
+
+  identity:
+  - name: api-key-users
+    apiKey:
+      selector: {}
+    credentials:
+      keySelector: APIKEY
+    extendedProperties:
+      - name: username
+        valueFrom: { authJSON: auth.identity.metadata.annotations.username }
+      - name: email_verified
+        value: true
+  - name: keycloak-users
+    oidc:
+      endpoint: http://keycloak.keycloak.svc.cluster.local:8080/realms/devconf
+    extendedProperties:
+      - name: username
+        valueFrom: { authJSON: auth.identity.preferred_username }
+
+  authorization:
+  - name: k8s-rbac
+    kubernetes:
+      user:
+        valueFrom:
+          authJSON: auth.identity.username
+      resourceAttributes:
+        namespace:
+          value: news-api
+        group:
+          value: news-api
+  - name: email-verified
+    opa:
+      inlineRego: |
+        allow { input.auth.identity.email_verified }

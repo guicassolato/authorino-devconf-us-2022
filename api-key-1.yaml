@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: api-key-1
+  labels:
+    authorino.kuadrant.io/managed-by: authorino
+  annotations:
+    username: john
+    name: John Smith
+stringData:
+  api_key: ndyBzreUzF4zqDQsqSPMHkRhriEOtcRx
+type: Opaque

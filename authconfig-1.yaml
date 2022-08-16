@@ -1,0 +1,26 @@
+apiVersion: authorino.kuadrant.io/v1beta1
+kind: AuthConfig
+metadata:
+  name: news-api-protection
+spec:
+  hosts:
+  - news-api.127.0.0.1.nip.io
+
+  identity:
+  - name: api-key-users
+    apiKey:
+      selector: {}
+    credentials:
+      keySelector: APIKEY
+
+  authorization:
+  - name: k8s-rbac
+    kubernetes:
+      user:
+        valueFrom:
+          authJSON: auth.identity.metadata.annotations.username
+      resourceAttributes:
+        namespace:
+          value: news-api
+        group:
+          value: news-api
